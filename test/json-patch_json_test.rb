@@ -206,5 +206,16 @@ describe "Section 4.2" do
     end
   end
 
+  describe "Target location MUST exist for the remove operation" do
+    let(:target_document) { %q'{"foo":["bar","qux","baz"]}' }
+    let(:operation_document) { %q'[{ "op": "remove"}]' }
+    it "will raise an exception if no target is specified" do
+      assert_raises(JSON::PatchError) do
+       JSON.patch(target_document, operation_document)
+      end
+    end
+
+  end
+
 end
 
