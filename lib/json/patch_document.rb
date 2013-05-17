@@ -43,6 +43,7 @@ module JSON
     reference_token = path_array.pop
     dest = build_target_array(path_array, target_document)
     add_operation(target_document, path_array, dest, reference_token, operation_document["value"])
+    JSON.dump(target_document)
   end
 
   def self.add_to_original(object, path, dest, new_array)
@@ -50,7 +51,6 @@ module JSON
       obj[(Array === obj ? part.to_i : part)]
       if part == path.last
         object[part] = new_array
-        JSON.dump(object)
       end
     end
   end
@@ -60,8 +60,7 @@ module JSON
       new_array = dest.insert reference_token.to_i, value
       return self.add_to_original(obj, path, dest, new_array)
     else
-      obj[reference_token] = value
-      JSON.dump(obj)
+      dest[reference_token] = value
     end
   end
   
@@ -72,15 +71,14 @@ module JSON
     reference_token = path_array.pop
     dest = build_target_array(path_array, target_document)
     remove_operation(target_document, path_array, dest, reference_token)
+    JSON.dump(target_document)
   end
 
   def self.remove_operation(obj, path, dest, reference_token)
     if Array === dest
       dest.delete_at reference_token.to_i
-      JSON.dump(obj)
     else
       obj.delete reference_token
-      JSON.dump(obj)
     end
   end
 
@@ -92,10 +90,32 @@ module JSON
     dest = build_target_array(path_array, target_document)
     remove_operation(target_document, path_array, dest, reference_token)
     add_operation(target_document, path_array, dest, reference_token, operation_document["value"])
+    JSON.dump(target_document)
+  end
+
+  def self.remove_operation(obj, path, dest, reference_token)
+    if Array === dest
+      dest.delete_at reference_token.to_i
+    else
+      dest.delete reference_token
+    end
   end
 
   def self.move(target_document, operation_document)
-    return true
+    raise JSON::PatchError if operation_document["from"] == nil
+    from_json_pointer = operation_document["from"]
+    from_path_array =  parse_target(from_json_pointer)
+    from_reference_token = from_path_array.pop
+    from = build_target_array(from_path_array, target_document)
+    moving_value = remove_operation(target_document, from_path_array, from, from_reference_token)
+
+    to_json_pointer = operation_document["path"]
+    to_path_array =  parse_target(to_json_pointer)
+    to_reference_token = to_path_array.pop
+    to = build_target_array(to_path_array, target_document)
+    add_operation(target_document, to_path_array, to, to_reference_token, moving_value)
+
+    JSON.dump(target_document)
   end
 
   def self.copy(target_document, operation_document)

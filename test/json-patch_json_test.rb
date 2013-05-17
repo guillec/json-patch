@@ -29,7 +29,7 @@ other values are errors.
     let(:add_operation_document) { %q'[{"op":"add","path":"/foo/1","value":"qux"}]' }
     let(:remove_operation_document) { %q'[{ "op": "remove", "path": "/baz" }]' }
     let(:replace_operation_document) { %q'[{"op":"replace","path":"/foo/1","value":"qux"}]' }
-    let(:move_operation_document) { %q'[{"op": "move", "path": "/a/b/c"}]' }
+    let(:move_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
     let(:copy_operation_document) { %q'[{"op": "copy", "path": "/a/b/c"}]' }
     let(:error_operation_document) { %q'[{"op": "hammer time"}]' }
 
@@ -250,3 +250,48 @@ The target location MUST exist for the operation to be successful.
   end
 end
 
+describe "Section 4.4" do
+
+=begin
+The "move" operation removes the value at a specified location and
+adds it to the target location.
+=end
+
+  describe "Moving operation" do
+    let(:target_document) { %q'{"foo":{"bar":"baz","waldo":"fred"},"qux":{"corge":"grault"}}' }
+    let(:operation_document) { %q'[{ "op": "move", "from":"/foo/waldo", "path": "/qux/thud" }]' }
+    it "will move a object element to new location" do
+      expected  = %q'{"foo":{"bar":"baz"},"qux":{"corge":"grault","thud":"fred"}}'
+      assert_equal expected, JSON.patch(target_document, operation_document)
+    end
+  end
+
+  describe "Moving operation" do
+    let(:target_document) { %q'{"foo":["add","grass","cows","eat"]}' }
+    let(:operation_document) { %q'[{ "op": "move", "from":"/foo/1", "path": "/foo/3" }]' }
+    it "will move a array element to new location" do
+      expected  = %q'{"foo":["add","cows","eat","grass"]}'
+      assert_equal expected, JSON.patch(target_document, operation_document)
+    end
+  end
+
+=begin
+The "from" location MUST exist.
+=end
+
+  describe "From location MUST exist for the move operation" do
+    let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
+    let(:operation_document) { %q'[{ "op": "move", "value": "boo" }]' }
+    it "will raise an exception if no from location is specified" do
+      assert_raises(JSON::PatchError) do
+       JSON.patch(target_document, operation_document)
+      end
+    end
+  end
+
+=begin
+TODO The "from" location MUST NOT be a proper prefix of the "path"
+   location; i.e., a location cannot be moved into one of its children.
+=end
+
+end
