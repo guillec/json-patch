@@ -188,11 +188,20 @@ describe "Section 4.2" do
   The remove value removes the value at the target location
 =end
 
-  describe "Remove the value at the target location" do
+  describe "Removing a object member at a target location" do
     let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
     let(:operation_document) { %q'[{ "op": "remove", "path": "/baz" }]' }
     it "will remove memeber of object" do
       expected = %q'{"foo":"bar"}'
+      assert_equal expected, JSON.patch(target_document, operation_document)
+    end
+  end
+
+  describe "Removing a array element a target location" do
+    let(:target_document) { %q'{"foo":["bar","qux","baz"]}' }
+    let(:operation_document) { %q'[{ "op": "remove", "path": "/foo/1" }]' }
+    it "will remove object in array" do
+      expected = %q'{"foo":["bar","baz"]}'
       assert_equal expected, JSON.patch(target_document, operation_document)
     end
   end

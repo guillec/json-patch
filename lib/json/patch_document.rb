@@ -71,17 +71,17 @@ module JSON
     path_array =  parse_target(json_pointer)
     reference_token = path_array.pop
     dest = build_target_array(path_array, target_document)
-    remove_operation(dest, reference_token)
+    remove_operation(target_document, path_array, dest, reference_token)
   end
 
-  def self.remove_operation(object, reference_token)
-    if object === Array
-
+  def self.remove_operation(obj, path, dest, reference_token)
+    if Array === dest
+      dest.delete_at reference_token.to_i
+      JSON.dump(obj)
     else
-      object.delete reference_token
-      JSON.dump(object)
+      obj.delete reference_token
+      JSON.dump(obj)
     end
-
   end
 
   def self.replace(target_document, operation_document)
