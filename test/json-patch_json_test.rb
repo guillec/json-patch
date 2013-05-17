@@ -28,7 +28,7 @@ other values are errors.
     let(:target_document) { %q'{ "foo":["bar","baz"] }' }
     let(:add_operation_document) { %q'[{"op":"add","path":"/foo/1","value":"qux"}]' }
     let(:remove_operation_document) { %q'[{ "op": "remove", "path": "/baz" }]' }
-    let(:replace_operation_document) { %q'[{"op": "replace", "path": "/a/b/c"}]' }
+    let(:replace_operation_document) { %q'[{"op":"replace","path":"/foo/1","value":"qux"}]' }
     let(:move_operation_document) { %q'[{"op": "move", "path": "/a/b/c"}]' }
     let(:copy_operation_document) { %q'[{"op": "copy", "path": "/a/b/c"}]' }
     let(:error_operation_document) { %q'[{"op": "hammer time"}]' }
@@ -214,8 +214,39 @@ describe "Section 4.2" do
        JSON.patch(target_document, operation_document)
       end
     end
-
   end
 
+end
+
+describe "Section 4.3" do
+
+=begin
+The "replace" operation replaces the value at the target location
+with a new value.  The operation object MUST contain a "value" member
+whose content specifies the replacement value.
+=end
+
+  describe "Replacing a value at a target" do
+    let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
+    let(:operation_document) { %q'[{ "op": "replace", "path": "/baz", "value": "boo" }]' }
+    it "will replace old value with a new value" do
+      expected  = %q'{"foo":"bar","baz":"boo"}'
+      assert_equal expected, JSON.patch(target_document, operation_document)
+    end
+  end
+
+=begin
+The target location MUST exist for the operation to be successful.
+=end
+
+  describe "Target location MUST exist for the replace operation" do
+    let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
+    let(:operation_document) { %q'[{ "op": "replace", "value": "boo" }]' }
+    it "will raise an exception if no target is specified" do
+      assert_raises(JSON::PatchError) do
+       JSON.patch(target_document, operation_document)
+      end
+    end
+  end
 end
 

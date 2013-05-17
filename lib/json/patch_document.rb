@@ -85,7 +85,13 @@ module JSON
   end
 
   def self.replace(target_document, operation_document)
-    return true
+    raise JSON::PatchError if operation_document["path"] == nil
+    json_pointer = operation_document["path"]
+    path_array =  parse_target(json_pointer)
+    reference_token = path_array.pop
+    dest = build_target_array(path_array, target_document)
+    remove_operation(target_document, path_array, dest, reference_token)
+    add_operation(target_document, path_array, dest, reference_token, operation_document["value"])
   end
 
   def self.move(target_document, operation_document)
