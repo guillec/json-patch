@@ -101,6 +101,14 @@ module JSON
     end
   end
 
+  def self.get_value_at(obj, path, dest, reference_token)
+    if Array === dest
+      dest.at reference_token.to_i
+    else
+      dest[reference_token]
+    end
+  end
+
   def self.move(target_document, operation_document)
     raise JSON::PatchError if operation_document["from"] == nil
     from_json_pointer = operation_document["from"]
@@ -119,7 +127,20 @@ module JSON
   end
 
   def self.copy(target_document, operation_document)
-    return true
+    raise JSON::PatchError if operation_document["from"] == nil
+    temp_doc = target_document.clone
+    from_json_pointer = operation_document["from"]
+    from_path_array =  parse_target(from_json_pointer)
+    from_reference_token = from_path_array.pop
+    from = build_target_array(from_path_array, temp_doc)
+    moving_value = get_value_at(temp_doc, from_path_array, from, from_reference_token)
+
+    to_json_pointer = operation_document["path"]
+    to_path_array =  parse_target(to_json_pointer)
+    to_reference_token = to_path_array.pop
+    to = build_target_array(to_path_array, target_document)
+    add_operation(target_document, to_path_array, to, to_reference_token, moving_value)
+    JSON.dump(target_document)
   end
 
 end

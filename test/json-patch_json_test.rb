@@ -30,7 +30,7 @@ other values are errors.
     let(:remove_operation_document) { %q'[{ "op": "remove", "path": "/baz" }]' }
     let(:replace_operation_document) { %q'[{"op":"replace","path":"/foo/1","value":"qux"}]' }
     let(:move_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
-    let(:copy_operation_document) { %q'[{"op": "copy", "path": "/a/b/c"}]' }
+    let(:copy_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
     let(:error_operation_document) { %q'[{"op": "hammer time"}]' }
 
     it "'op' member contains 'add' value" do
@@ -293,5 +293,35 @@ The "from" location MUST exist.
 TODO The "from" location MUST NOT be a proper prefix of the "path"
    location; i.e., a location cannot be moved into one of its children.
 =end
+
+end
+
+describe "Section 4.5" do
+
+=begin
+The "copy" operation copies the value at a specified location to the
+target location.
+=end
+
+  describe "Copy operation" do
+    let(:target_document) { %q'{"foo":{"bar":"baz","waldo":"fred"},"qux":{"corge":"grault"}}' }
+    let(:operation_document) { %q'[{ "op": "copy", "from":"/foo/waldo", "path": "/qux/waldo" }]' }
+    it "will copy a value from a specified location to the target location" do
+      expected  = %q'{"foo":{"bar":"baz","waldo":"fred"},"qux":{"corge":"grault","waldo":"fred"}}'
+      assert_equal expected, JSON.patch(target_document, operation_document)
+    end
+  end
+
+#The "from" location MUST exist for the operation to be successful.
+
+  describe "From location MUST exist for the copy operation" do
+    let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
+    let(:operation_document) { %q'[{ "op": "copy", "path": "/foo" }]' }
+    it "will raise an exception if no from location is specified" do
+      assert_raises(JSON::PatchError) do
+       JSON.patch(target_document, operation_document)
+      end
+    end
+  end
 
 end
