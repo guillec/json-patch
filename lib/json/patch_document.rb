@@ -9,7 +9,7 @@ module JSON
 
     operation_documents.each do |operation_doc|
       raise PatchError if operation_doc["op"] == nil
-      raise PatchError unless ["add","remove","replace","move","copy"].include?(operation_doc["op"])
+      raise PatchError unless ["add","remove","replace","move","copy","test"].include?(operation_doc["op"])
       raise PatchError if operation_doc["path"] == nil
       return send(operation_doc["op"].to_sym, target_document, operation_doc)
     end
@@ -141,6 +141,16 @@ module JSON
     to = build_target_array(to_path_array, target_document)
     add_operation(target_document, to_path_array, to, to_reference_token, moving_value)
     JSON.dump(target_document)
+  end
+
+  def self.test(target_document, operation_document)
+    raise JSON::PatchError if operation_document["value"] == nil
+    json_pointer = operation_document["path"]
+    path_array =  parse_target(json_pointer)
+    reference_token = path_array.pop
+    dest = build_target_array(path_array, target_document)
+    value = get_value_at(target_document, path_array, dest, reference_token)
+    value == operation_document["value"]
   end
 
 end

@@ -31,6 +31,7 @@ other values are errors.
     let(:replace_operation_document) { %q'[{"op":"replace","path":"/foo/1","value":"qux"}]' }
     let(:move_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
     let(:copy_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
+    let(:test_operation_document) { %q'[{"op":"test", "path":"/foo/1","value":"baz"}]' }
     let(:error_operation_document) { %q'[{"op": "hammer time"}]' }
 
     it "'op' member contains 'add' value" do
@@ -51,6 +52,10 @@ other values are errors.
 
     it "'op' member contains 'copy' value" do
       assert JSON.patch(target_document, copy_operation_document)
+    end
+
+    it "'op' member contains 'test' value" do
+      assert JSON.patch(target_document, test_operation_document)
     end
 
     it "raises error when 'op' member contains invalid 'hammer time' value" do
@@ -323,5 +328,102 @@ target location.
       end
     end
   end
+
+end
+
+describe "Section 4.6" do
+
+#The "test" operation tests that a value at the target location is equal to a specified value.
+
+
+#The operation object MUST contain a "value" member that conveys the value to be compared to the target location's value.
+  describe "Test operation MUST contain a 'value' member" do
+    let(:target_document) { %q'{"baz":"qux","foo":["a",2,"c"]}' }
+    let(:operation_document) { %q'[{ "op": "test", "path": "/baz"}, {"op": "test", "path": "/foo/1"}]' }
+    it "will raise a JSON::PatchError" do
+      assert_raises(JSON::PatchError) do
+        JSON.patch(target_document, operation_document)
+      end
+    end
+  end
+
+#The target location MUST be equal to the "value" value for the operation to be considered successful.
+
+  describe "The target location MUST be equal to the 'value'" do
+    let(:target_document) { %q'{"baz":"qux","foo":["a",2,"c"]}' }
+    let(:operation_document) { %q'[{ "op": "test", "path": "/baz", "value": "qux"}, {"op": "test", "path": "/foo/1", "value": "bar"}]' }
+    it "Will return true since that values are equal" do
+      assert JSON.patch(target_document, operation_document)
+    end
+  end
+
+
+
+=begin
+Here, "equal" means that the value at the target location and the
+value conveyed by "value" are of the same JSON type, and that they
+are considered equal by the following rules for that type:
+
+  1  strings: are considered equal if they contain the same number of
+     Unicode characters and their code points are byte-by-byte equal.
+=end
+
+  describe "Strings are equal if they contain the same number of Unicode characters" do
+    let(:target_document) { %q'{"baz":"qux","foo":["a",2,"c"]}' }
+    let(:operation_document) { %q'[{ "op": "test", "path": "/baz", "value": "qux"}]' }
+    it "Will return true since the strings are equal" do
+      assert JSON.patch(target_document, operation_document)
+    end
+  end
+
+  #2  numbers: are considered equal if their values are numerically equal.
+  #
+  describe "Numbers are equal if their values are numerically equal" do
+    let(:target_document) { %q'{"baz": 1,"foo":["a",2,"c"]}' }
+    let(:operation_document) { %q'[{ "op": "test", "path": "/baz", "value": 1}]' }
+    it "Will return true since the numbers are equal" do
+      assert JSON.patch(target_document, operation_document)
+    end
+  end
+
+=begin
+3  arrays: are considered equal if they contain the same number of
+     values, and if each value can be considered equal to the value at
+     the corresponding position in the other array, using this list of
+     type-specific rules.
+=end
+
+  describe "Arrays are equal they contain then same number of values and these values are equal" do
+    let(:target_document) { %q'{"baz": 1,"foo":["a",2,"c"]}' }
+    let(:operation_document) { %q'[{"op": "test", "path": "/foo", "value": ["a",2,"c"]}]' }
+    it "Will return true since arrays and values are equal" do
+      assert JSON.patch(target_document, operation_document)
+    end
+  end
+
+=begin
+  4  objects: are considered equal if they contain the same number of
+     members, and if each member can be considered equal to a member in
+     the other object, by comparing their keys (as strings) and their
+     values (using this list of type-specific rules).
+=end
+
+  describe "Objects are equal if they contain then same number of members and each member has same keys and values" do
+    let(:target_document) { %q'{"baz": 1,"foo":{"foo": "bar","hammer": "time"}}' }
+    let(:operation_document) { %q'[{"op": "test", "path": "/foo", "value": {"foo": "bar", "hammer":"time"}}]' }
+    it "Will return true since objects equal" do
+      assert JSON.patch(target_document, operation_document)
+    end
+  end
+
+=begin
+  TODO
+  5  literals (false, true, and null): are considered equal if they are
+     the same.
+
+  Also, note that ordering of the serialization of object members is
+     not significant.
+=end
+
 
 end
