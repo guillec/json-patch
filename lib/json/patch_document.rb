@@ -84,6 +84,7 @@ module JSON
 
   def self.replace(target_document, operation_document)
     raise JSON::PatchError if operation_document["path"] == nil
+    raise JSON::PatchError if operation_document["value"] == nil
     json_pointer = operation_document["path"]
     path_array =  parse_target(json_pointer)
     reference_token = path_array.pop
