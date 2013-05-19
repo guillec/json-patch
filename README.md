@@ -1,5 +1,6 @@
 # JSON::Patch
 [![Build Status](https://travis-ci.org/guillec/json-patch.png)](https://travis-ci.org/guillec/json-patch)
+[![Code Climate](https://codeclimate.com/github/guillec/json-patch.png)](https://codeclimate.com/github/guillec/json-patch)
 
 TODO: Write a gem description
 
