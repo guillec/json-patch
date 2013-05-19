@@ -2,8 +2,8 @@
 [![Build Status](https://travis-ci.org/guillec/json-patch.png)](https://travis-ci.org/guillec/json-patch)
 [![Code Climate](https://codeclimate.com/github/guillec/json-patch.png)](https://codeclimate.com/github/guillec/json-patch)
 
-This gem augments Ruby's built-in JSON library to support patching JSON
-blobs in accordance with the json-patch+json media type standard http://www.rfc-editor.org/rfc/rfc6902.txt
+This gem augments Ruby's built-in JSON library to support JSON Patch
+(identified by the json-patch+json media type). http://tools.ietf.org/html/rfc6902
 
 ## Installation
 
