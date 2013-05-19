@@ -26,6 +26,7 @@ Then, use it:
 ```ruby
 # The example from http://tools.ietf.org/html/rfc6902#appendix-A
 
+# Add Object Member
 target_document = <<-JSON
   { "foo": "bar"}
 JSON
@@ -40,6 +41,8 @@ JSON.patch(target_document, operations_document)
 # => 
 { "baz": "qux", "foo": "bar" }
 
+
+# Add Array Element
 target_document = <<-JSON
   { "foo": [ "bar", "baz" ] }
 JSON
