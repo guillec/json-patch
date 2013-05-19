@@ -24,8 +24,7 @@ Or install it yourself as:
 Then, use it:
 
 ```ruby
-# The example from
-  http://tools.ietf.org/html/rfc6902#appendix-A
+# The example from http://tools.ietf.org/html/rfc6902#appendix-A
 
 target_document = <<-JSON
   { "foo": "bar"}
