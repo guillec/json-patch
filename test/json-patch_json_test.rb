@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'json/patch_document'
+require 'json/patch'
 
 describe "Section 4: Operation objects" do
 
