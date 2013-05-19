@@ -347,4 +347,19 @@ describe "Section 4.6: The test operation" do
      not significant.
 =end
 
+describe "JSON::Patch object" do
+
+  describe "JSON::Patch.new " do
+    let(:target_document) { {"foo" => { "bar" => "baz", "waldo" => "fred" }, "qux" => { "corge" => "grault" } } }
+    let(:operation_document) { [{ "op"=> "copy", "from" => "/foo/waldo", "path" => "/qux/waldo" }] }
+
+    it "can handle plain ruby objects" do
+      expected  = %q'{"foo":{"bar":"baz","waldo":"fred"},"qux":{"corge":"grault","waldo":"fred"}}'
+      assert_equal expected, JSON::Patch.new(target_document, operation_document).call
+    end
+  end
+
+end
+
+
 end

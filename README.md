@@ -60,6 +60,18 @@ JSON.patch(target_document, operations_document)
 { "foo": [ "bar", "qux", "baz" ] }
 ```
 
+If you'd prefer to operate on pure Ruby objects rather than JSON
+strings, you can construct a JSON::Patch object instead.
+
+```ruby
+target_document = { "foo" => [ "bar", "baz" ] }
+operations_document = [{ "op" => "add", "path" => "/foo/1", "value" => "qux" }]
+
+JSON::Patch.new(target_document, operations_document).call
+# => 
+{ "foo": [ "bar", "qux", "baz" ] }
+```
+
 
 ## Contributing
 
