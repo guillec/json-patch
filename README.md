@@ -21,7 +21,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Then, use it:
+
+```ruby
+# The example from
+  http://tools.ietf.org/html/rfc6902#appendix-A
+
+target_document = <<-JSON
+  { "foo": "bar"}
+JSON
+
+operations_document = <<-JSON
+[
+  { "op": "add", "path": "/baz", "value": "qux" }
+]
+JSON
+
+JSON.patch(target_document, operations_document)
+# => 
+{ "baz": "qux", "foo": "bar" }
+
+target_document = <<-JSON
+  { "foo": [ "bar", "baz" ] }
+JSON
+
+operations_document = <<-JSON
+[
+  { "op": "add", "path": "/foo/1", "value": "qux" }
+]
+JSON
+
+JSON.patch(target_document, operations_document)
+# => 
+{ "foo": [ "bar", "qux", "baz" ] }
+```
+
 
 ## Contributing
 
