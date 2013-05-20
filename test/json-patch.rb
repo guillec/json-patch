@@ -347,6 +347,8 @@ describe "Section 4.6: The test operation" do
      not significant.
 =end
 
+end
+
 describe "JSON::Patch object" do
 
   describe "JSON::Patch.new " do
@@ -358,8 +360,5 @@ describe "JSON::Patch object" do
       assert_equal expected, JSON::Patch.new(target_document, operation_document).call
     end
   end
-
-end
-
 
 end
