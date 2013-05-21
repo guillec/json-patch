@@ -30,6 +30,7 @@ module JSON
 
     private
     def allowed?(operation)
+      raise JSON::PatchError if JSON.dump(operation).scan(/"op":/).length > 1
       raise JSON::PatchError if !operation.has_key?("op")
       raise JSON::PatchError unless ["add","remove","replace","move","copy","test"].include?(operation["op"])
       raise JSON::PatchError if !operation.has_key?("path")
