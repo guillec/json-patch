@@ -69,7 +69,7 @@ operations_document = [{ "op" => "add", "path" => "/foo/1", "value" => "qux" }]
 
 JSON::Patch.new(target_document, operations_document).call
 # => 
-{ "foo": [ "bar", "qux", "baz" ] }
+{ "foo" => [ "bar", "qux", "baz" ] }
 ```
 
 
