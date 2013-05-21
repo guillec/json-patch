@@ -88,6 +88,7 @@ module JSON
       value      = find_value(target_doc, operation_doc, path)
       test_value = operation_doc["value"]
 
+      raise JSON::PatchError if value != test_value
       target_doc if value == test_value
     end
 
@@ -142,12 +143,19 @@ module JSON
       path_array  = split_path(path)
       ref_token   = path_array.pop
       target_item = build_target_array(path_array, target_doc)
-
       if Array === target_item
+        if is_a_number?(ref_token)
         target_item.at ref_token.to_i
+        else
+          raise JSON::PatchError
+        end
       else
         target_item[ref_token]
       end
+    end
+
+    def is_a_number?(s)
+      s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true 
     end
 
     def build_target_array(path_array, target_doc)

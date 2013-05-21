@@ -1,4 +1,4 @@
-require 'test_helper'
+equire 'test_helper'
 require 'json/patch'
 
 describe "01 tests.json" do
