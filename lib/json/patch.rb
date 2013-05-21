@@ -110,14 +110,13 @@ module JSON
     end
 
     def add_array(doc, path_array, target_item, ref_token, value)
-      if valid_index?(target_item, ref_token)
-        if ref_token == "-"
-          new_array = target_item << value
-        else
-          new_array = target_item.insert ref_token.to_i, value
-        end
-        add_to_target_document(doc, path_array, target_item, new_array)
+      return unless valid_index?(target_item, ref_token)
+      if ref_token == "-"
+        new_array = target_item << value
+      else
+        new_array = target_item.insert ref_token.to_i, value
       end
+      add_to_target_document(doc, path_array, target_item, new_array)
     end
 
     def valid_index?(item_array, index)
