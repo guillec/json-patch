@@ -4,7 +4,7 @@ require 'json/patch'
 describe "IETF JSON Patch Test" do
 
   TESTDIR = File.dirname File.expand_path __FILE__
-  spec_json    = File.read File.join TESTDIR, 'json-patch-tests', 'tests.json'
+  spec_json    = File.read File.join TESTDIR, 'json-patch-tests', 'spec_tests.json'
   specs = JSON.load spec_json
 
   describe "Test JSON File" do

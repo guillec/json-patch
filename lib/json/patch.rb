@@ -95,6 +95,7 @@ module JSON
     end
 
     def add_object(target_doc, target_item, ref_token, value)
+      raise JSON::PatchError if target_item.nil? 
       if ref_token.nil?
         target_doc.replace(value)
       else
