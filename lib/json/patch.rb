@@ -22,50 +22,45 @@ module JSON
     def call
       return @target_doc if @operations_doc.empty?
       @operations_doc.each do |operation|
+        operation = operation.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         if allowed?(operation)
-          return send(operation["op"].to_sym, @target_doc, operation)
+          return send(operation[:op].to_sym, @target_doc, operation)
         end
       end
     end
 
     private
     def allowed?(operation)
-      raise JSON::PatchError if !operation.has_key?("op")
-      raise JSON::PatchError unless ["add","remove","replace","move","copy","test"].include?(operation["op"])
-      raise JSON::PatchError if !operation.has_key?("path")
+      operation.fetch(:op) { raise JSON::PatchError }
+      raise JSON::PatchError unless ["add","remove","replace","move","copy","test"].include?(operation[:op])
+      operation.fetch(:path) { raise JSON::PatchError }
       true
     end
 
     def add(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("value")
-      path  = operation_doc["path"]
-      value = operation_doc["value"]
+      path  = operation_doc[:path]
+      value = operation_doc.fetch(:value) { raise JSON::PatchError  }
 
       add_operation(target_doc, path, value)
       target_doc
     end
 
     def remove(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("path")
-      path = operation_doc["path"]
+      path = operation_doc.fetch(:path) { raise JSON::PatchError }
 
       remove_operation(target_doc, path)
       target_doc
     end
 
     def replace(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("path")
-      raise JSON::PatchError if !operation_doc.has_key?("value") 
-
       remove(target_doc, operation_doc)
       add(target_doc, operation_doc)
       target_doc
     end
 
     def move(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("from")
-      src   = operation_doc["from"]
-      dest  = operation_doc["path"]
+      src   = operation_doc.fetch(:from) { raise JSON::PatchError }
+      dest  = operation_doc[:path]
       value = remove_operation(target_doc, src)
 
       add_operation(target_doc, dest, value)
@@ -73,9 +68,8 @@ module JSON
     end
 
     def copy(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("from")
-      src   = operation_doc["from"]
-      dest  = operation_doc["path"]
+      src   = operation_doc.fetch(:from) { raise JSON::PatchError }
+      dest  = operation_doc[:path]
       value = find_value(target_doc, operation_doc, src)
 
       add_operation(target_doc, dest, value)
@@ -83,10 +77,9 @@ module JSON
     end
 
     def test(target_doc, operation_doc)
-      raise JSON::PatchError if !operation_doc.has_key?("value")
-      path       = operation_doc["path"]
+      path       = operation_doc[:path]
       value      = find_value(target_doc, operation_doc, path)
-      test_value = operation_doc["value"]
+      test_value = operation_doc.fetch(:value) { raise JSON::PatchError }
 
       raise JSON::PatchError if value != test_value
       target_doc if value == test_value

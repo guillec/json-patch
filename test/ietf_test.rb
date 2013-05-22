@@ -15,21 +15,42 @@ describe "IETF JSON Patch Test" do
       comment = spec['comment']
       unless spec['disabled']
 
-        it "#{comment || spec['error'] || index}" do
+        describe "A JSON String " do
+          it "#{comment || spec['error'] || index}" do
 
-          target_doc     = JSON.dump(spec['doc']) if spec['doc']
-          operations_doc = JSON.dump(spec['patch']) if spec['patch']
-          expected_doc   = JSON.dump(spec['expected']) if spec['expected']
+            target_doc     = JSON.dump(spec['doc']) if spec['doc']
+            operations_doc = JSON.dump(spec['patch']) if spec['patch']
+            expected_doc   = JSON.dump(spec['expected']) if spec['expected']
 
-          if spec['error']
-            assert_raises(ex(spec['error'])) do
-              JSON.patch(target_doc, operations_doc)
+            if spec['error']
+              assert_raises(ex(spec['error'])) do
+                JSON.patch(target_doc, operations_doc)
+              end
+            else
+              result_doc = JSON.patch(target_doc, operations_doc)
+              assert_equal JSON.parse(expected_doc || target_doc), JSON.parse(result_doc)
             end
-          else
-            result_doc = JSON.patch(target_doc, operations_doc)
-            assert_equal JSON.parse(expected_doc || target_doc), JSON.parse(result_doc)
           end
         end
+
+        describe "A Ruby Object" do
+          it "#{comment || spec['error'] || index}" do
+
+            target_doc     = eval(spec['doc'].to_s) if spec['doc']
+            operations_doc = eval(spec['patch'].to_s) if spec['patch']
+            expected_doc   = eval(spec['expected'].to_s) if spec['expected']
+
+            if spec['error']
+              assert_raises(ex(spec['error'])) do
+                JSON::Patch.new(target_doc, operations_doc).call
+              end
+            else
+              result_doc = JSON::Patch.new(target_doc, operations_doc).call
+              assert_equal (expected_doc || target_doc), result_doc
+            end
+          end
+        end
+
       end
     end
   end
