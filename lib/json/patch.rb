@@ -124,9 +124,10 @@ module JSON
       path_array  = split_path(path)
       ref_token   = path_array.pop
       target_item = build_target_array(path_array, target_doc)
+      raise JSON::PatchObjectOperationOnArrayException if target_item.nil?
 
       if Array === target_item
-        target_item.delete_at ref_token.to_i
+        target_item.delete_at ref_token.to_i if valid_index?(target_item, ref_token)
       else
         target_item.delete ref_token
       end
@@ -140,7 +141,7 @@ module JSON
         if is_a_number?(ref_token)
         target_item.at ref_token.to_i
         else
-          raise JSON::PatchError
+          raise JSON::PatchObjectOperationOnArrayException
         end
       else
         target_item[ref_token]

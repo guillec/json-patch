@@ -60,7 +60,11 @@ describe "IETF JSON Patch Test" do
     case msg
     when /Out of bounds/i then
       JSON::PatchOutOfBoundException
-    when /Object operation on array target/ then
+    when /Object operation on array target/i then
+      JSON::PatchObjectOperationOnArrayException
+    when /with bad number/i then
+      JSON::PatchObjectOperationOnArrayException
+    when /get array element 1/ then
       JSON::PatchObjectOperationOnArrayException
     else
       JSON::PatchError
