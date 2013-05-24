@@ -154,7 +154,11 @@ module JSON
     def build_target_array(path_array, target_doc)
       path_array.inject(target_doc) do |doc, item|
         key = (doc.kind_of?(Array) ? item.to_i : item)
-        doc[key]
+        if doc.kind_of?(Array)
+          doc[key] 
+        else
+          doc.has_key?(key) ? doc[key] : doc[key.to_sym] unless doc.kind_of?(Array)
+        end
       end
     end
 
