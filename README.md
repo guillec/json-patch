@@ -1,4 +1,4 @@
-# JSON::Patch (Version 1 Coming Soon)
+# JSON::Patch
 [![Build Status](https://travis-ci.org/guillec/json-patch.png)](https://travis-ci.org/guillec/json-patch)
 [![Code Climate](https://codeclimate.com/github/guillec/json-patch.png)](https://codeclimate.com/github/guillec/json-patch)
 [![Coverage Status](https://coveralls.io/repos/guillec/json-patch/badge.png)](https://coveralls.io/r/guillec/json-patch)
