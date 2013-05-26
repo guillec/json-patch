@@ -10,8 +10,6 @@ describe "IETF JSON Patch Test" do
   describe "Test JSON File" do
     specs.each_with_index do |spec, index|
       next unless spec['doc']
-
-
       comment = spec['comment']
       unless spec['disabled']
 
@@ -50,7 +48,6 @@ describe "IETF JSON Patch Test" do
             end
           end
         end
-
       end
     end
   end
