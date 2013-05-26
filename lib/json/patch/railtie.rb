@@ -1,7 +1,7 @@
 require 'rails'
 
 module JSON
-  class MergePatch
+  class Patch
     # This class registers our gem with Rails.
     class Railtie < ::Rails::Railtie
       # When the application loads, this will cause Rails to know
