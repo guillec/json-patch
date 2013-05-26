@@ -1,4 +1,5 @@
 require 'json'
+require 'json/patch/railtie' if defined?(Rails)
 
 module JSON
   PatchError                           = Class.new(StandardError)
