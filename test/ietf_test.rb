@@ -3,9 +3,9 @@ require 'json/patch'
 
 describe "IETF JSON Patch Test" do
 
-  TESTDIR = File.dirname File.expand_path __FILE__
-  spec_json    = File.read File.join TESTDIR, 'json-patch-tests', 'tests.json'
-  specs = JSON.load spec_json
+  TESTDIR   = File.dirname File.expand_path __FILE__
+  spec_json = File.read File.join TESTDIR, 'json-patch-tests', 'tests.json'
+  specs     = JSON.load spec_json
 
   describe "Test JSON File" do
     specs.each_with_index do |spec, index|
@@ -15,7 +15,7 @@ describe "IETF JSON Patch Test" do
       comment = spec['comment']
       unless spec['disabled']
 
-        describe "A JSON String " do
+        describe "JSON.patch" do
           it "#{comment || spec['error'] || index}" do
 
             target_doc     = JSON.dump(spec['doc']) if spec['doc']
@@ -33,12 +33,12 @@ describe "IETF JSON Patch Test" do
           end
         end
 
-        describe "A Ruby Object" do
+        describe "JSON::Patch.new" do
           it "#{comment || spec['error'] || index}" do
 
-            target_doc     = eval(spec['doc'].to_s) if spec['doc']
-            operations_doc = eval(spec['patch'].to_s) if spec['patch']
-            expected_doc   = eval(spec['expected'].to_s) if spec['expected']
+            target_doc     = spec['doc'] if spec['doc']
+            operations_doc = spec['patch'] if spec['patch']
+            expected_doc   = spec['expected'] if spec['expected']
 
             if spec['error']
               assert_raises(ex(spec['error'])) do
