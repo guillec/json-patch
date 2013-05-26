@@ -25,9 +25,10 @@ module JSON
       @operations_doc.each do |operation|
         operation = operation.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         if allowed?(operation)
-          return send(operation[:op].to_sym, @target_doc, operation)
+          @target_doc = send(operation[:op].to_sym, @target_doc, operation)
         end
       end
+      return @target_doc
     end
 
     private
