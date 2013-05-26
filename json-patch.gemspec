@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "json-patch"
   spec.version       = Json::Patch::VERSION
   spec.authors       = ["Guille Carlos"]
-  spec.email         = ["ramon.g.carlos@gmail.com"]
+  spec.email         = ["guille@bitpop.in"]
   spec.description   = %q{An implementation of RFC 6902: JSON Patch.}
   spec.summary       = %q{An implementation of RFC 6902: JSON Patch.}
   spec.homepage      = "https://github.com/guillec/json-patch"
