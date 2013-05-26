@@ -293,15 +293,6 @@ describe "Section 4.6: The test operation" do
     end
   end
 
-  describe "The test operation target location MUST be equal to the 'value' member" do
-    let(:target_document) { %q'{"baz":"qux","foo":["a",2,"c"]}' }
-    let(:operation_document) { %q'[{ "op": "test", "path": "/baz", "value": "qux"}, {"op": "test", "path": "/foo/1", "value": "bar"}]' }
-
-    it "will return true because the values are equal" do
-      assert JSON.patch(target_document, operation_document)
-    end
-  end
-
   describe "Testing that strings have the same number of Unicode characters and their code points are byte-to-byte equal" do
     let(:target_document) { %q'{"baz":"qux","foo":["a",2,"c"]}' }
     let(:operation_document) { %q'[{ "op": "test", "path": "/baz", "value": "qux"}]' }
