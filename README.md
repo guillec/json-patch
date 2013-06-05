@@ -4,8 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/guillec/json-patch/badge.png)](https://coveralls.io/r/guillec/json-patch)
 
 Inspired by: 
-Steve Klabnik: https://github.com/steveklabnik/json-merge_patch
-Tenderlove: https://github.com/tenderlove/hana
+- Steve Klabnik: https://github.com/steveklabnik/json-merge_patch
+- Tenderlove: https://github.com/tenderlove/hana
 
 This gem augments Ruby's built-in JSON library to support JSON Patch
 (identified by the json-patch+json media type). http://tools.ietf.org/html/rfc6902
