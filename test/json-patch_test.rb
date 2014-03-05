@@ -21,7 +21,7 @@ describe "Section 4: Operation objects" do
     let(:replace_operation_document) { %q'[{"op":"replace","path":"/foo/1","value":"qux"}]' }
     let(:move_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
     let(:copy_operation_document) { %q'[{"op":"replace","from":"foo","path":"/foo/1","value":"qux"}]' }
-    let(:test_operation_document) { %q'[{"op":"test", "path":"/foo/1","value":"baz"}]' }
+    let(:tst_operation_document) { %q'[{"op":"test", "path":"/foo/1","value":"baz"}]' }
     let(:error_operation_document) { %q'[{"op": "hammer time"}]' }
 
     it "can contain a 'add' value" do
@@ -45,7 +45,7 @@ describe "Section 4: Operation objects" do
     end
 
     it "can contain a 'test' value" do
-      assert JSON.patch(target_document, test_operation_document)
+      assert JSON.patch(target_document, tst_operation_document)
     end
 
     it "will raise exception when 'op' member contains invalid 'hammer time' value" do
