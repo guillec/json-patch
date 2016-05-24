@@ -121,6 +121,17 @@ describe "Section 4.1: The add operation" do
     end
   end
 
+  describe "the target location MUST reference" do
+    let(:target_document) { %q'{"foo":"bar","baz":"wat"}' }
+    let(:operation_document) { %q'[{ "op": "add", "path": "/baz/quux", "value": "qux" }]' }
+
+    it "will raise exception if the target location is string (neither an array nor object)" do
+      assert_raises(JSON::PatchError) do
+        JSON.patch(target_document, operation_document)
+      end
+    end
+  end
+
 =begin
 TODO
 When the operation is applied, the target location MUST reference one of:
@@ -175,6 +186,18 @@ describe "Section 4.2: The remove operation" do
       end
     end
   end
+
+  describe "The target location MUST exist for the operation to be successful." do
+    let(:target_document) { %q'{"foo":"bar","baz":"qux"}' }
+    let(:operation_document) { %q'[{ "op": "remove", "path": "/foo/baz" }]' }
+
+    it "will rails an exception if the member in the path does not exist" do
+      assert_raises(JSON::PatchError) do
+       JSON.patch(target_document, operation_document)
+      end
+    end
+  end
+
 
 end
 
