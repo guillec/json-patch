@@ -34,7 +34,7 @@ describe "IETF JSON Patch Test" do
         describe "JSON::Patch.new" do
           it "#{comment || spec['error'] || index}" do
 
-            target_doc     = spec['doc'] if spec['doc']
+            target_doc     = Marshal.load(Marshal.dump(spec['doc'])) if spec['doc']
             operations_doc = spec['patch'] if spec['patch']
             expected_doc   = spec['expected'] if spec['expected']
 
