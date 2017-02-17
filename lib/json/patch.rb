@@ -97,7 +97,7 @@ module JSON
     end
 
     def add_object(target_doc, target_item, ref_token, value)
-      raise JSON::PatchError if target_item.nil? 
+      raise JSON::PatchError if (target_item.nil? || !(Hash === target_item))
       if ref_token.nil?
         target_doc.replace(value)
       else
@@ -130,8 +130,10 @@ module JSON
 
       if Array === target_item
         target_item.delete_at ref_token.to_i if valid_index?(target_item, ref_token)
-      else
+      elsif Hash === target_item
         target_item.delete ref_token
+      else
+        raise JSON::PatchError
       end
     end
 
