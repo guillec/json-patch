@@ -5,6 +5,15 @@ module JSON
   PatchError                           = Class.new(StandardError)
   PatchOutOfBoundException             = Class.new(StandardError)
   PatchObjectOperationOnArrayException = Class.new(StandardError)
+  PatchInvalidOperationError           = Class.new(PatchError)
+  PatchMissingTargetObjectError        = Class.new(PatchError)
+  PatchTestNotEqualError               = Class.new(PatchError)
+
+  class PatchMissingKeyError < PatchError
+    def initialize(key)
+      super("Missing key: #{key}")
+    end
+  end
 
   def self.patch(target_doc, operations_doc)
     target_doc            = JSON.parse(target_doc)
@@ -33,22 +42,22 @@ module JSON
 
     private
     def allowed?(operation)
-      operation.fetch(:op) { raise JSON::PatchError }
-      raise JSON::PatchError unless ["add","remove","replace","move","copy","test"].include?(operation[:op])
-      operation.fetch(:path) { raise JSON::PatchError }
+      operation.fetch(:op) { raise JSON::PatchMissingKeyError.new(:op) }
+      raise JSON::PatchInvalidOperationError unless ["add","remove","replace","move","copy","test"].include?(operation[:op])
+      operation.fetch(:path) { raise JSON::PatchMissingKeyError.new(:path) }
       true
     end
 
     def add(target_doc, operation_doc)
       path  = operation_doc[:path]
-      value = operation_doc.fetch(:value) { raise JSON::PatchError  }
+      value = operation_doc.fetch(:value) { raise JSON::PatchMissingKeyError.new(:value)  }
 
       add_operation(target_doc, path, value)
       target_doc
     end
 
     def remove(target_doc, operation_doc)
-      path = operation_doc.fetch(:path) { raise JSON::PatchError }
+      path = operation_doc.fetch(:path) { raise JSON::PatchMissingKeyError.new(:path) }
 
       remove_operation(target_doc, path)
       target_doc
@@ -61,7 +70,7 @@ module JSON
     end
 
     def move(target_doc, operation_doc)
-      src   = operation_doc.fetch(:from) { raise JSON::PatchError }
+      src   = operation_doc.fetch(:from) { raise JSON::PatchMissingKeyError.new(:from) }
       dest  = operation_doc[:path]
       value = remove_operation(target_doc, src)
 
@@ -70,7 +79,7 @@ module JSON
     end
 
     def copy(target_doc, operation_doc)
-      src   = operation_doc.fetch(:from) { raise JSON::PatchError }
+      src   = operation_doc.fetch(:from) { raise JSON::PatchMissingKeyError.new(:from) }
       dest  = operation_doc[:path]
       value = find_value(target_doc, operation_doc, src)
 
@@ -81,9 +90,9 @@ module JSON
     def test(target_doc, operation_doc)
       path       = operation_doc[:path]
       value      = find_value(target_doc, operation_doc, path)
-      test_value = operation_doc.fetch(:value) { raise JSON::PatchError }
+      test_value = operation_doc.fetch(:value) { raise JSON::PatchMissingKeyError.new(:value) }
 
-      raise JSON::PatchError if value != test_value
+      raise JSON::PatchTestNotEqualError if value != test_value
       target_doc if value == test_value
     end
 
@@ -97,7 +106,7 @@ module JSON
     end
 
     def add_object(target_doc, target_item, ref_token, value)
-      raise JSON::PatchError if target_item.nil? 
+      raise JSON::PatchMissingTargetObjectError if target_item.nil?
       if ref_token.nil?
         target_doc.replace(value)
       else
@@ -151,14 +160,14 @@ module JSON
     end
 
     def is_a_number?(s)
-      s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true 
+      s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
     end
 
     def build_target_array(path_array, target_doc)
       path_array.inject(target_doc) do |doc, item|
         key = (doc.kind_of?(Array) ? item.to_i : item)
         if doc.kind_of?(Array)
-          doc[key] 
+          doc[key]
         else
           doc.has_key?(key) ? doc[key] : doc[key.to_sym] unless doc.kind_of?(Array)
         end
